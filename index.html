@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <title>target</title>
+    <style type="text/css">
+        .left{float:left;}
+        .clearfix{width:1px;height:1px;}
+        li:focus{color: red;font-weight: bold;}
+        li:hover{color: orange;font-weight: bold;}
+        .right{float: left;position: fixed;margin-left: 300px;}
+        .success,.fail{font-weight: bold;}
+        .success{color: green;}
+        .fail{color: red;}
+    </style>
+</head>
+<body>
+<div>
+    <div class="left">
+        <ul>
+            <li id='page' max='pageSize'>Title</li>
+        </ul>
+    </div>
+    <div class="right">
+        <textarea id="text1" rows="10" style="width: 300px;"></textarea><br/>
+        <textarea id="text2" rows="10" style="width: 300px;"></textarea><br/>
+        <input type="text" style="width: 300px;"/><br/>
+        <button type="button" id="btnCopy1">Copy1</button>
+        <button type="button" id="btnCopy2">Copy2</button>
+        <button type="button" id="btnCopy3">Copy3</button>
+        <button type="button" id="btnRename">Rename</button><br/><br/><br/>
+        <button type="button" id="btnReload">Reload</button>
+        <div id="result"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<script type="text/javascript">
+    var arrys = document.querySelectorAll("li");
+    for(var i = 0; i < arrys.length; i++){
+        arrys[i].onclick=onClick;
+    }
+    function onClick(e){
+        console.info(e.target);
+        var item = e.target;
+        var id = item.getAttribute("id");
+        var size = item.getAttribute("max");
+        item.style.color="green";
+        item.style.fontWeight="bold";
+        inputName.value = item.innerText;
+        sendToJava(id, size, true);
+    }
+    var text1 = document.querySelectorAll("textarea")[0];
+    var text2 = document.querySelectorAll("textarea")[1];
+    var inputName = document.querySelectorAll("input")[0];
+    var btnCopy1 = document.getElementById("btnCopy1");
+    var btnCopy2 = document.getElementById("btnCopy2");
+    var btnCopy3 = document.getElementById("btnCopy3");
+    var btnRename = document.getElementById("btnRename");
+    var btnReload = document.getElementById("btnReload");
+    var divResult = document.getElementById("result");
+    btnCopy1.onclick = function (e){
+        javaConnector.setSysClipboardText(text1.value);
+    }
+    btnCopy2.onclick = function (e){
+        javaConnector.setSysClipboardText(text2.value);
+    }
+    //="<li id=@"&B1&"@ max=@"&C1&"@>"&A1&"</li>"
+    var retry = "index = index - 1;\n" +
+        "loadImage();";
+    btnCopy3.onclick = function (e){
+        javaConnector.setSysClipboardText(retry);
+    }
+    btnRename.onclick = function (e){
+        javaConnector.rename(inputName.value)
+    }
+    btnReload.onclick = function (e){
+        javaConnector.reload();
+    }
+    var jsConnector = {
+        showResult: function (result){
+            var rs = result.split("@@@");
+            if(rs.length > 1){
+                text1.value = rs[0];
+                text2.value = rs[1];
+            } else {
+                text1.value = rs[0];
+            }
+        },
+        renameResult: function (result){
+            divResult.innerHTML = result;
+        }
+    }
+    function getJsConnector(){
+        return jsConnector;
+    }
+    function sendToJava(id, size, split){
+        javaConnector.fxgenerate(id, size, split);
+    }
+</script>
+</body>
+</html>
